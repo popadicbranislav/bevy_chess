@@ -1,6 +1,17 @@
 use bevy::prelude::*;
 use bevy_mod_picking::PickableBundle;
 
+pub struct Square {
+    pub x: u8,
+    pub y: u8,
+}
+
+impl Square {
+    fn is_white(&self) -> bool {
+        (self.x + self.y + 1) % 2 == 0
+    }
+}
+
 pub fn create_board(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -26,7 +37,8 @@ pub fn create_board(
                     transform: Transform::from_translation(Vec3::new(i as f32, 0., j as f32)),
                     ..Default::default()
                 })
-                .insert_bundle(PickableBundle::default());
+                .insert_bundle(PickableBundle::default())
+                .insert(Square { x: i, y: j });
         }
     }
 }
