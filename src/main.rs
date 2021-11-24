@@ -18,9 +18,9 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(PickingPlugin)
         .add_plugin(InteractablePickingPlugin)
-        .add_plugin(HighlightablePickingPlugin)
+        // .add_plugin(HighlightablePickingPlugin)
+        .add_plugin(board::BoardPlugin)
         .add_startup_system(setup.system())
-        .add_startup_system(board::create_board.system())
         .add_startup_system(pieces::create_pieces.system())
         .run();
 }
