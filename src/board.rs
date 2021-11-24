@@ -13,8 +13,8 @@ impl Square {
 }
 
 #[derive(Default)]
-struct SelectedSquare {
-    _entity: Option<Entity>,
+pub struct SelectedSquare {
+    entity: Option<Entity>,
 }
 
 fn create_board(
@@ -48,9 +48,8 @@ fn create_board(
     }
 }
 
-pub fn color_squares(
-    // selection: Res<Selection>,
-    // selected_square: Res<SelectedSquare>,
+pub fn color_and_select_squares(
+    mut selected_square: ResMut<SelectedSquare>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     query: Query<(
         Entity,
@@ -60,24 +59,16 @@ pub fn color_squares(
         &Selection,
     )>,
 ) {
-    // Get entity under the cursor, if there is one
-    // let top_entity = if let Some((entity, _intersection)) = pick_state.top(Group::default()) {
-    //     Some(*entity)
-    // } else {
-    //     None
-    // };
-
-    for (_entity, square, material_handle, hover, selected) in query.iter() {
+    for (entity, square, material_handle, hover, selection) in query.iter() {
         // Get the actual material
         let material = materials.get_mut(material_handle).unwrap();
 
-        // println!("{:?}", selected);
-
         // Change the material color
-        // material.base_color = if Some(entity) == top_entity {
         material.base_color = if hover.hovered() {
             Color::rgb(0.8, 0.3, 0.3)
-        } else if selected.selected() {
+        } else if selection.selected() {
+            selected_square.entity = Some(entity);
+            // } else if Some(entity) == selected_square.entity {
             Color::rgb(0.9, 0.1, 0.1)
         } else if square.is_white() {
             Color::rgb(1., 0.9, 0.9)
@@ -92,6 +83,6 @@ impl Plugin for BoardPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<SelectedSquare>()
             .add_startup_system(create_board.system())
-            .add_system(color_squares.system());
+            .add_system(color_and_select_squares.system());
     }
 }
