@@ -25,7 +25,27 @@ pub struct Piece {
     pub y: u8,
 }
 
-pub fn create_pieces(
+pub struct PiecesPlugin;
+impl Plugin for PiecesPlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app.add_startup_system(create_pieces.system())
+            .add_system(move_pieces.system());
+    }
+}
+
+fn move_pieces(time: Res<Time>, mut query: Query<(&mut Transform, &Piece)>) {
+    for (mut transform, piece) in query.iter_mut() {
+        // Get the direction to move in
+        let direction = Vec3::new(piece.x as f32, 0., piece.y as f32) - transform.translation;
+
+        // Only move if the piece isn't already there (distance is big)
+        if direction.length() > 0.1 {
+            transform.translation += direction.normalize() * time.delta_seconds();
+        }
+    }
+}
+
+fn create_pieces(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -51,13 +71,6 @@ pub fn create_pieces(
     // Add some materials
     let white_material = materials.add(Color::rgb(1., 0.8, 0.8).into());
     let black_material = materials.add(Color::rgb(0., 0.2, 0.2).into());
-
-    // spawn_rook(
-    //     &mut commands,
-    //     white_material.clone(),
-    //     rook_handle.clone(),
-    //     Vec3::new(0., 0., 0.),
-    // );
 
     spawn_rook(
         &mut commands,

@@ -20,8 +20,8 @@ fn main() {
         .add_plugin(InteractablePickingPlugin)
         // .add_plugin(HighlightablePickingPlugin)
         .add_plugin(board::BoardPlugin)
+        .add_plugin(pieces::PiecesPlugin)
         .add_startup_system(setup.system())
-        .add_startup_system(pieces::create_pieces.system())
         .run();
 }
 
